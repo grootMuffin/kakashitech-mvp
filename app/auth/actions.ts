@@ -58,9 +58,35 @@ export async function signup(formData: FormData): Promise<AuthActionResult> {
 }
 
 // 3. 退出登录 Action
-export async function signout(): Promise<AuthActionResult> {
+
+export async function signout(): Promise<void> {
   const supabase = await createClient()
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
   redirect('/login')
+}
+export async function unbindLine(): Promise<void> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    throw new Error('未登录用户无法执行此操作')
+  }
+
+  // 将当前用户的 line_user_id 清空为 null
+  const { error } = await supabase
+    .from('profiles')
+    .update({ 
+      line_user_id: null,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', user.id)
+
+  if (error) {
+    console.error('解除绑定失败:', error)
+    throw new Error('解绑失败，请重试')
+  }
+
+  // 刷新当前设置页面，使 UI 立即更新为“未绑定”状态
+  revalidatePath('/dashboard/settings')
 }

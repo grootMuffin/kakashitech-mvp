@@ -64,21 +64,6 @@ def main():
         print("\n🌐 [4/5] 清除DNS缓存")
         run_cmd("aws cloudfront create-invalidation --distribution-id E10NS07EAF5KAI --paths '/*' --no-cli-pager")
           
-        # # 1. 读取模板文件并渲染变量
-        # template_path = "nginx.conf.template"
-        # if not os.path.exists(template_path):
-        #     print(f"❌ 找不到模板文件 {template_path}")
-        #     sys.exit(1)
-
-        # with open(template_path, "r", encoding="utf-8") as f:
-        #     template_content = f.read()
-
-        # # 使用 Template 安全替换，只替换定义的变量，忽略 Nginx 自带的 $host, $http_upgrade 等
-        # nginx_conf = Template(template_content).safe_substitute(
-        #     DOMAIN_OR_IP=DOMAIN_OR_IP,
-        #     NEXT_PORT=NEXT_PORT
-        # )
-
         print("\n🔄 [5/5] 重启/平滑重载 PM2 进程...")
         remote_pm2_script = f'''
         mkdir -p {SERVER_PATH}
